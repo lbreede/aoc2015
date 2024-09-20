@@ -35,6 +35,8 @@ fn part_two(input: &str) -> u32 {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+
     #[test]
     fn test_part_one_examples() {
         assert_eq!(part_one(""), 0);

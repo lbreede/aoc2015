@@ -1,5 +1,3 @@
-use md5;
-
 pub fn main() {
     use std::time::Instant;
     use thousands::Separable;
@@ -31,10 +29,7 @@ fn solve(input: &str, n: usize) -> u32 {
     let mut i: u32 = 0;
     loop {
         let digest = format!("{:x}", md5::compute(format!("{}{}", input, i)));
-        if digest
-            .chars()
-            .take(n)
-            .all(|x| x == '0') {
+        if digest.chars().take(n).all(|x| x == '0') {
             return i;
         }
         i += 1;

@@ -1,8 +1,13 @@
-pub fn main() {
-    use std::time::Instant;
-    use thousands::Separable;
+use std::time::Instant;
+use thousands::Separable;
 
+pub fn main(skip: bool) {
     println!("Day 4: The Ideal Stocking Stuffer");
+
+    if skip {
+        println!("Skipped!\n");
+        return;
+    }
     let input = include_str!("input.txt");
 
     let now = Instant::now();

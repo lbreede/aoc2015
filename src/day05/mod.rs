@@ -1,14 +1,15 @@
-use std::collections::HashSet;
+use fancy_regex::Regex;
+
+static INPUT: &str = include_str!("input.txt");
 
 pub fn main() {
     use std::time::Instant;
     use thousands::Separable;
 
     println!("Day 5: Doesn't He Have Intern-Elves For This?");
-    let input = include_str!("input.txt");
 
     let now = Instant::now();
-    let day01_result = part_one(input);
+    let day01_result = part_one(INPUT);
     let elapsed = now.elapsed();
     println!(
         "Part 1: {} ({:.2?})",
@@ -17,7 +18,7 @@ pub fn main() {
     );
 
     let now = Instant::now();
-    let day02_result = part_two(input);
+    let day02_result = part_two(INPUT);
     let elapsed = now.elapsed();
 
     println!(
@@ -27,41 +28,52 @@ pub fn main() {
     );
 }
 
+#[allow(dead_code)]
 fn has_three_vowels(s: &str) -> bool {
     let vowels = ['a', 'e', 'i', 'o', 'u'];
     s.chars().filter(|c| vowels.contains(c)).count() >= 3
 }
+
+#[allow(dead_code)]
 fn has_double_letter(s: &str) -> bool {
-    s.chars()
-        .collect::<Vec<char>>()
-        .windows(2)
-        .any(|w| w[0] == w[1])
+    s.as_bytes().windows(2).any(|w| w[0] == w[1])
 }
 
+#[allow(dead_code)]
 fn has_bad_strings(s: &str) -> bool {
-    let bad_strings = ["ab", "cd", "pq", "xy"];
-    !bad_strings.into_iter().any(|bs| s.contains(bs))
+    let bad_pat = ["ab", "cd", "pq", "xy"];
+    !bad_pat.iter().any(|pat| s.contains(pat))
 }
 
+#[allow(dead_code)]
 fn is_nice(s: &str) -> bool {
     has_three_vowels(s) && has_double_letter(s) && has_bad_strings(s)
 }
 
 fn part_one(input: &str) -> u32 {
+    let re1 = Regex::new(r"(:?[aeiou].*){3}").unwrap();
+    let re2 = Regex::new(r"(:?[a-zA-Z])\1").unwrap();
+    let re3 = Regex::new(r"ab|cd|pq|xy").unwrap();
     input
         .lines()
-        .filter(|s| is_nice(s))
+        // .filter(|s| is_nice(s))
+        .filter(|s| {
+            re1.is_match(s).unwrap() && re2.is_match(s).unwrap() && !re3.is_match(s).unwrap()
+        })
         .count()
         .try_into()
         .unwrap()
 }
 
-fn has_double_double_letter(s: &str) -> bool {
-    false
-}
-
 fn part_two(input: &str) -> u32 {
-    0
+    let re1 = Regex::new(r"(..).*\1").unwrap();
+    let re2 = Regex::new(r"(.).\1").unwrap();
+    input
+        .lines()
+        .filter(|s| re1.is_match(s).unwrap() && re2.is_match(s).unwrap())
+        .count()
+        .try_into()
+        .unwrap()
 }
 
 #[cfg(test)]
@@ -100,20 +112,11 @@ mod tests {
 
     #[test]
     fn test_part_one() {
-        let input = include_str!("input.txt");
-        assert_eq!(part_one(input), 255);
+        assert_eq!(part_one(INPUT), 255);
     }
 
     #[test]
-    fn test_has_double_double_letter() {
-        assert!(has_double_double_letter("xyxy"));
-        assert!(has_double_double_letter("aabcdefgaa"));
-        assert!(!has_double_double_letter("aaa"));
+    fn test_part_two() {
+        assert_eq!(part_two(INPUT), 55);
     }
-
-    // #[test]
-    // fn test_part_two() {
-    //     let input = include_str!("input.txt");
-    //     assert_eq!(part_two(input), 9_962_624);
-    // }
 }
